@@ -23,8 +23,6 @@ def img_resize(imagePath):
 
 with open("reddit.creds", "r") as fin:
     client_id = fin.readline().replace("\n", "")
-    client_secret = fin.readline().replace("\n", "")
-    password = fin.readline().replace("\n", "")
 
 reddit = praw.Reddit(client_id=client_id,
                      client_secret=client_secret,
