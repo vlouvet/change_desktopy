@@ -4,7 +4,7 @@ changes desktop background using Reddit API on Windows 10
 
 This code was created and tested for use in Windows 10, but may be expanded for use on Linux/Mac in the future.
 
-Requirements: python3.x, requests, pillow, praw, shutils, ctypes
+Requirements: python 3.x, requests, pillow, praw, shutils, ctypes
 
 update change_desktop.py to point to a folder where the images should be stored, this should also be where the script and the .creds file lives.
 
