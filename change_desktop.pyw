@@ -2,7 +2,6 @@ import praw
 import ctypes
 import shutil
 import requests
-import PIL
 from PIL import Image
 import os
 
