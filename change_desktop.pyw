@@ -5,7 +5,6 @@ import requests
 from PIL import Image
 import os
 
-
 if not os.path.isdir(os.path.join(os.path.expanduser("~"), "Desktop", "bgs")):
     os.mkdir(os.path.join(os.path.expanduser("~"), "Desktop", "bgs"))
     #directory created
@@ -24,45 +23,51 @@ def img_resize(raw_img):
         #resize img to a width of 1920p height
         wpercent = (basewidth / float(img.size[0]))
         hsize = int((float(img.size[1]) * float(wpercent)))
-        img = img.resize((basewidth, hsize), PIL.Image.ANTIALIAS)
+        img = img.resize((basewidth, hsize), Image.ANTIALIAS)
     if img.size[1] < 1080:
         pass
     else:
         #resize img to a maximum of 1080p height
         hpercent = (baseheight / float(img.size[1]))
         wsize = int((float(img.size[0]) * float(hpercent)))
-        img = img.resize((wsize, baseheight), PIL.Image.ANTIALIAS)
+        img = img.resize((wsize, baseheight), Image.ANTIALIAS)
     return img
 
-with open("reddit.creds", "r") as fin:
+with open("reddit.creds.txt", "r") as fin:
     client_id = fin.readline().replace("\n", "")
-    client_secret = fin.readline().replace("\n", "")
-    password = fin.readline().replace("\n", "")
+
 
 reddit = praw.Reddit(client_id=client_id,
-                     client_secret=client_secret,
-                     password=password,
+                     client_secret="",
+                     password="",
                      user_agent='vdesktopchange by /u/louvetvicente',
                      username='louvetvicente')
                      
 subreddit = reddit.subreddit('art')
 
 submission = subreddit.random()
-
-r = requests.get(submission.url, stream=True)
-if "https://i.redd.it/" in submission.url:
-    filename = submission.url.replace("https://i.redd.it/", "")
-elif "https://i.imgur.com/" in submission.url:
-    filename = submission.url.replace("https://i.imgur.com/", "")
-if ".gif" in submission.url:
-    pass
-else:
-    if r.status_code == 200:
-        r.raw.decode_content = True
-        img = img_resize(r.raw)
-        imagePath = os.path.join(directory, filename)
-        print(imagePath)
-        img.save(imagePath)
-        changeBG(imagePath)
+if not submission.over_18:
+    print(submission.title)
+    print(submission.url)
+    r = requests.get(submission.url, stream=True)
+    if "https://i.redd.it/" in submission.url:
+        filename = submission.url.replace("https://i.redd.it/", "")
+    elif "https://i.imgur.com/" in submission.url:
+        filename = submission.url.replace("https://i.imgur.com/", "")
+    elif 'https://live.staticflickr' in submission.url:
+        filename = submission.url.replace("https://live.staticflickr.com/", "")
     else:
-        print("ERROR: "+str(r.status_code))
+        print("unknown image file host, exiting")
+        pass
+
+    if ".gif" not in submission.url:
+        if r.status_code == 200:
+            r.raw.decode_content = True
+            img = img_resize(r.raw)
+            if not filename in os.listdir(directory):
+                imagePath = os.path.join(directory, filename)
+                print(imagePath)
+                img.save(imagePath)
+                changeBG(imagePath)
+        else:
+            print("ERROR: "+str(r.status_code))
