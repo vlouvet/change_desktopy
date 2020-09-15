@@ -1,3 +1,4 @@
 pillow
 praw
 requests
+requests-cache
